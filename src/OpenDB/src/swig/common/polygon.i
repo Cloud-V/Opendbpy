@@ -29,6 +29,8 @@
 #include "swig_common.h"
 %}
 
+#ifdef SWIG_POLYGONS
+
 %template(Points) std::vector<odb::Point>;
 %template(Rects) std::vector<odb::Rect>;
 %template(Polygon90Set) std::vector<Polygon90>;
@@ -70,3 +72,5 @@ Polygon90Set* orSets(const std::vector<Polygon90Set>& sets);
 
 %newobject subtractSet;
 Polygon90Set* subtractSet(Polygon90Set* set1, const Polygon90Set* set2);
+
+#endif

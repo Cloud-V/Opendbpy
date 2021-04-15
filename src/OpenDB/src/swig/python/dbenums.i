@@ -434,6 +434,69 @@
 		$1 = 0;
 	}
 }
+%typemap(out) odb::dbTechLayer, dbTechLayer {
+	PyObject *obj;
+	if ($1.getValue() == odb::dbTechLayer::TRIMPOLY) {
+		obj = PyString_FromString("TRIMPOLY");
+	} else if ($1.getValue() == odb::dbTechLayer::DIFFUSION) {
+		obj = PyString_FromString("DIFFUSION");
+	} else if ($1.getValue() == odb::dbTechLayer::BELOWDIEEDGE) {
+		obj = PyString_FromString("BELOWDIEEDGE");
+	} else if ($1.getValue() == odb::dbTechLayer::ABOVEDIEEDGE) {
+		obj = PyString_FromString("ABOVEDIEEDGE");
+	} else if ($1.getValue() == odb::dbTechLayer::PWELL) {
+		obj = PyString_FromString("PWELL");
+	} else if ($1.getValue() == odb::dbTechLayer::PWELL) {
+		obj = PyString_FromString("NWELL");
+	} else if ($1.getValue() == odb::dbTechLayer::NONE) {
+		obj = PyString_FromString("NONE");
+	}
+	$result=obj;
+}
+%typemap(in) odb::dbTechLayer, dbTechLayer {
+	char *str = PyString_AsString(PyUnicode_AsASCIIString($input));
+	if (strcasecmp(str, "TRIMPOLY") == 0) {
+		$1 = odb::dbTechLayer::TRIMPOLY;
+	} else if (strcasecmp(str, "DIFFUSION") == 0) {
+		$1 = odb::dbTechLayer::DIFFUSION;
+	} else if (strcasecmp(str, "BELOWDIEEDGE") == 0) {
+		$1 = odb::dbTechLayer::BELOWDIEEDGE;
+	} else if (strcasecmp(str, "ABOVEDIEEDGE") == 0) {
+		$1 = odb::dbTechLayer::ABOVEDIEEDGE;
+	} else if (strcasecmp(str, "PWELL") == 0) {
+		$1 = odb::dbTechLayer::PWELL;
+	} else if (strcasecmp(str, "NWELL") == 0) {
+		$1 = odb::dbTechLayer::NWELL;
+	} else if (strcasecmp(str, "NONE") == 0) {
+		$1 = odb::dbTechLayer::NONE;
+	}
+}
+%typemap(typecheck) odb::dbTechLayerType, dbTechLayerType {
+	char *str = PyString_AsString(PyUnicode_AsASCIIString($input));
+	bool found = false;
+	if (str) {
+		if (strcasecmp(str, "TRIMPOLY") == 0) {
+			found = true;
+		} 	else if (strcasecmp(str, "DIFFUSION") == 0) {
+			found = true;
+		} 	else if (strcasecmp(str, "BELOWDIEEDGE") == 0) {
+			found = true;
+		} 	else if (strcasecmp(str, "ABOVEDIEEDGE") == 0) {
+			found = true;
+		} 	else if (strcasecmp(str, "PWELL") == 0) {
+			found = true;
+		} 	else if (strcasecmp(str, "NWELL") == 0) {
+			found = true;
+		} 	else if (strcasecmp(str, "NONE") == 0) {
+			found = true;
+		}
+	}
+	if (found) {
+		$1 = 1;
+	} else {
+		$1 = 0;
+	}
+}
 %typemap(out) odb::dbTechLayerType, dbTechLayerType {
 	PyObject *obj;
 	if ($1.getValue() == odb::dbTechLayerType::Value::ROUTING) {

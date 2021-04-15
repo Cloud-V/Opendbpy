@@ -1,45 +1,52 @@
-include("openroad")
+# Include python
+find_package(Python3 COMPONENTS Development REQUIRED)
 
-swig_lib(NAME          opendbpy
-         NAMESPACE     odb
-         LANGUAGE      python
-         I_FILE        ../common/opendb.i
-         SWIG_INCLUDES ${PROJECT_SOURCE_DIR}/include/opendb
-                       ${PROJECT_SOURCE_DIR}/src/swig/python
-         SCRIPTS       ${CMAKE_CURRENT_BINARY_DIR}/opendbpy.py
+if (NOT (PythonLibs_FOUND OR Python3_INCLUDE_DIRS))
+    message(STATUS "Could not find python, disabling Python SWIG Module")
+    return()
+endif()
+message(STATUS "Enabling OpenDB Python SWIG Module")
+
+include_directories(${Python3_INCLUDE_DIRS})
+
+set(OPENDB_PYTHON_SWIG_FILES
+    ${PROJECT_SOURCE_DIR}/src/swig/python/opendbpy.i
 )
 
-target_include_directories(opendbpy
-    PUBLIC
-        ${PROJECT_SOURCE_DIR}/include/opendb
+set_source_files_properties(${OPENDB_PYTHON_SWIG_FILES} 
+    PROPERTIES CPLUSPLUS ON
 )
 
-target_link_libraries(opendbpy
+include_directories(${PROJECT_SOURCE_DIR}/include/opendb)
+
+set(CMAKE_SWIG_FLAGS 
+    "-w509,503,501,472,467,402,401,317,325,378,383,389,365,362,314,258,240,203,201")
+# Add swig module
+swig_add_library(opendbpy 
+    TYPE     SHARED
+    LANGUAGE python 
+    SOURCES  ${OPENDB_PYTHON_SWIG_FILES}
+)
+swig_link_libraries(opendbpy
     PUBLIC
         opendb
         utl
-        tcl
-        cdl
         opendb_swig_common
-        Boost::boost
+        Python3::Python
 )
 
-# Executable
-add_executable(opendbpy-bin 
-                main.cpp 
+# Files to install with Python
+set(PYTHON_INSTALL_FILES
+    opendbpy.py
+    _opendbpy${CMAKE_SHARED_LIBRARY_SUFFIX}
 )
 
-target_include_directories(opendbpy-bin
-  PUBLIC
-    ${PROJECT_SOURCE_DIR}/include/opendb
-)
+# Configure setup.py and copy to output directory
+set(SETUP_PY_IN ${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in)
+set(SETUP_PY_OUT ${CMAKE_CURRENT_BINARY_DIR}/setup.py)
+configure_file(${SETUP_PY_IN} ${SETUP_PY_OUT})
 
-target_link_libraries(opendbpy-bin
-  PUBLIC
-    opendbpy
-)
-
-set_target_properties(opendbpy-bin
-    PROPERTIES 
-        OUTPUT_NAME opendbpy
-)
+# Install target to call setup.py
+add_custom_target(install-python
+        DEPENDS _opendbpy
+        COMMAND python ${SETUP_PY_OUT} install)

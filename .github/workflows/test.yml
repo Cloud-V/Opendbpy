@@ -1,0 +1,26 @@
+name: Sanity Check
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v2
+      # Check the following link for tools already installed:
+      # https://github.com/actions/virtual-environments/blob/main/images/linux/Ubuntu2004-README.md
+      - name: Grab Dependencies
+        run: |
+          sudo apt-get install -y flex bison swig libboost-all-dev libspdlog-dev tcl-dev tk-dev
+          pip3 install click pyverilog
+      - name: Simple Compile Test
+        run: |
+          cd ./src/OpenDB/
+          mkdir -p ./build
+          cd ./build
+          CXXFLAGS=-I/usr/include/tcl VERBOSE=1 cmake ..
+          make -j $(nproc)

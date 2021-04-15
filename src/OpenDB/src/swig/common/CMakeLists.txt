@@ -8,6 +8,8 @@ target_include_directories(opendb_swig_common
     .
 )
 
+set_property(TARGET opendb_swig_common PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 target_link_libraries(opendb_swig_common
   PUBLIC
     defin
