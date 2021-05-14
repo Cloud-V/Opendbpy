@@ -130,6 +130,7 @@ class IOPlacer
  public:
   void init(odb::dbDatabase* db, Logger* logger);
   void clear();
+  void clearConstraints() { constraints_.clear(); };
   void run(bool random_mode);
   void printConfig();
   Parameters* getParameters() { return parms_.get(); }
@@ -194,6 +195,7 @@ class IOPlacer
   void initIOLists();
   void initParms();
   void randomPlacement();
+  void randomPlacement(std::vector<int> pin_indices, std::vector<int> slot_indices, bool top_layer);
   void findSlots(const std::set<int>& layers, Edge edge);
   void findSlotsForTopLayer();
   std::vector<Section> findSectionsForTopLayer(const odb::Rect& region);
@@ -212,6 +214,7 @@ class IOPlacer
   int assignGroupToSection(const std::vector<int> &io_group,
                            std::vector<Section> &sections);
   void assignConstrainedPinsToSections();
+  std::vector<int> findPinsForConstraint(const Constraint &constraint, Netlist& netlist);
   int returnIONetsHPWL(Netlist&);
   void findPinAssignment(std::vector<Section>& sections);
 

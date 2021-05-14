@@ -1,7 +1,8 @@
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//
 // BSD 3-Clause License
 //
-// Copyright (c) 2019, Nefelus Inc
+// Copyright (c) 2019, University of California, San Diego.
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -29,38 +30,24 @@
 // CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 // POSSIBILITY OF SUCH DAMAGE.
+//
+///////////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#include "PartitionMgr.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+namespace par {
 
-#include "layer.h"
-#include "master.h"
-#include "via.h"
+void
+PartOptions::setRandomSeed(int seed) {
+  seedGenerator_.seed(seed);
+}
 
-class Ath__db;
+void
+PartOptions::generateSeeds(int seeds) {
+  _seeds.clear();
 
-class Ath__tech
-{
- public:
-  Ath__layerTable* _layerTable;
-  Ath__masterViaTable* _viaTable;
-  Ath__masterTable* _masterTable;
+  while (_seeds.size() < seeds)
+    _seeds.insert(getNewSeed());
+}
 
-  uint _units;
-
- public:
-  Ath__tech(uint units, uint layerCnt, uint masterCnt);
-  ~Ath__tech();
-  int readLef(char* fileName);
-  int readLefMacros(char* fileName);
-  uint writeDB(Ath__db* db);
-  uint readLayersDB(FILE* fp);
-  FILE* openFP(char* dir, char* name, int format, char* mode);
-  uint readDB(Ath__db* db);
-  uint readViasDB(FILE* fp);
-  uint readMastersDB(FILE* fp);
-  uint readDBheader(FILE* fp, char* keyword, char* obj_type);
-};
+}  // namespace par
