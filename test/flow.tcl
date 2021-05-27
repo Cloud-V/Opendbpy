@@ -111,12 +111,8 @@ detailed_placement
 utl::metric ORD "utilization" [format %.0f [expr [rsz::utilization] * 100]]
 utl::metric ORD "design_area" [sta::format_area [rsz::design_area] 0]
 filler_placement $filler_cells
-if { [check_placement -verbose] } {
-  utl::metric DPL "errors" "errors"
-  fail "detailed placement failed"
-} else {
-  utl::metric DPL "errors" "pass"
-}
+set dp_errors [check_placement -verbose]
+utl::metric DPL "errors" $dp_errors
 
 ################################################################
 # Global routing
@@ -145,9 +141,12 @@ write_verilog -remove_cells $filler_cells $verilog_file
 ################################################################
 # Detailed routing
 
-set tr_params [make_tr_params $route_guide 0]
-
-detailed_route -param $tr_params
+set_thread_count [exec getconf _NPROCESSORS_ONLN]
+detailed_route -guide $route_guide \
+               -output_guide [make_result_file "${design}_${platform}_output_guide.mod"] \
+               -output_drc [make_result_file "${design}_${platform}_route_drc.rpt"] \
+               -output_maze [make_result_file "${design}_${platform}_maze.log"] \
+               -verbose 0
 
 set drv_count [detailed_route_num_drvs]
 utl::metric DRT "drv" $drv_count
